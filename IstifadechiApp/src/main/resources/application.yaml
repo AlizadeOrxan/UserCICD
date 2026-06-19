@@ -1,0 +1,56 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: service-a
+
+# Resilience4j Konfiqurasiyası
+resilience4j:
+  circuitbreaker:
+    instances:
+      serviceBInstance:       # Annotasiyada istifadə edəcəyimiz ad
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 4           # Son 4 sorğunu analiz et
+        failureRateThreshold: 50       # 4 sorğudan 2-si xəta olsa, dövrəni OPEN et
+        minimumNumberOfCalls: 2        # Vəziyyəti dəyişmək üçün ən az 2 sorğu gözlə
+        waitDurationInOpenState: 10s   # OPEN-dan HALF-OPEN-a keçid üçün 10 saniyə gözlə
+        permittedNumberOfCallsInHalfOpenState: 2 # HALF-OPEN-da yoxlamaq üçün 2 sorğuya icazə ver
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+
+# Actuator ilə UI statusunu izləmək üçün
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, circuitbreakers
+  endpoint:
+    health:
+      show-details: always
+
+#server:
+#  port: 8081
+#
+#spring:
+#  application:
+#    name: user-service
+#
+#  cloud:
+#    openfeign:
+#      circuitbreaker:
+#        enabled: true
+#
+#resilience4j:
+#  circuitbreaker:
+#    instances:
+#      discount-service:
+#        slidingWindowSize: 10
+#        minimumNumberOfCalls: 5
+#        failureRateThreshold: 50
+#        waitDurationInOpenState: 10s
+#
+#  retry:
+#    instances:
+#      discount-service:
+#        maxAttempts: 3
+#        waitDuration: 1s
